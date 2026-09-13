@@ -9,6 +9,7 @@ export function formatDate(date: Date): string {
 }
 
 export function parseDate(dateStr: string): Date {
+  if (!dateStr) return new Date();
   const [y, m, d] = dateStr.split('-').map(Number);
   return new Date(y, m - 1, d);
 }
@@ -38,10 +39,6 @@ export function addDays(date: Date, days: number): Date {
 /**
  * Syllabus & Deadline Text Parser
  * Parses pasted syllabus content or deadline lists.
- * Looks for patterns like:
- * - "CS101 Problem Set 1 - 2026-09-28 - 6 hrs"
- * - "MATH201 Calculus Midterm due Oct 15"
- * - "ENG102 Essay Draft 10/12/2026 4 hours"
  */
 export function parsePastedSyllabus(text: string, existingCourses: Course[]): { deadlines: Partial<Deadline>[]; detectedCourses: string[] } {
   const lines = text.split('\n').filter(line => line.trim().length > 0);
@@ -150,13 +147,9 @@ export function parsePastedSyllabus(text: string, existingCourses: Course[]): { 
  * Generate Week-by-Week Plans & Balance Load
  */
 export function buildWeekPlans(courses: Course[], deadlines: Deadline[], existingTasks: StudyTask[], referenceDate: Date = new Date()): WeekPlan[] {
-  // Sort deadlines by date
   const sortedDeadlines = [...deadlines].sort((a, b) => a.dueDate.localeCompare(b.dueDate));
-
-  // Determine date range: Start from Sunday of reference week, extend 8 weeks out (or max deadline date)
   const currentSunday = getSundayStart(referenceDate);
   
-  // Find max deadline date
   let maxDate = addDays(currentSunday, 7 * 7); // minimum 8 weeks view
   sortedDeadlines.forEach(d => {
     const dDate = parseDate(d.dueDate);
@@ -171,15 +164,12 @@ export function buildWeekPlans(courses: Course[], deadlines: Deadline[], existin
     const tempSaturday = addDays(tempSunday, 6);
     const weekEndStr = formatDate(tempSaturday);
 
-    // Find deadlines falling within this Sunday-Saturday week
     const weekDeadlines = sortedDeadlines.filter(d => d.dueDate >= weekStartStr && d.dueDate <= weekEndStr);
-
-    // Find tasks within this week
     const weekTasks = existingTasks.filter(t => t.date >= weekStartStr && t.date <= weekEndStr);
     const totalStudyHours = weekTasks.reduce((sum, t) => sum + (t.completed ? 0 : t.allocatedHours), 0);
 
     const weekLabel = `${tempSunday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${tempSaturday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
-    const weekKey = `${tempSunday.getFullYear()}-W${Math.ceil((tempSunday.getDate() + 6) / 7)}`;
+    const weekKey = `week-${weekStartStr}`;
 
     weekPlans.push({
       weekKey,
@@ -190,7 +180,7 @@ export function buildWeekPlans(courses: Course[], deadlines: Deadline[], existin
       totalStudyHours,
       deadlines: weekDeadlines,
       tasks: weekTasks,
-      isOverloaded: weekDeadlines.length >= 3 // Flag 3+ deadlines overlapping
+      isOverloaded: weekDeadlines.length >= 3
     });
 
     tempSunday = addDays(tempSunday, 7);
@@ -201,7 +191,6 @@ export function buildWeekPlans(courses: Course[], deadlines: Deadline[], existin
 
 /**
  * Sunday Night Re-balance & Automatic Study Plan Generator
- * Distributes study preparation hours across the days preceding each deadline.
  */
 export function generateBalancedStudyTasks(deadlines: Deadline[], existingTasks: StudyTask[], referenceDate: Date = new Date()): StudyTask[] {
   const activeDeadlines = deadlines.filter(d => d.status !== 'completed');
@@ -211,7 +200,6 @@ export function generateBalancedStudyTasks(deadlines: Deadline[], existingTasks:
   const existingTaskIds = new Set(updatedTasks.map(t => t.id));
 
   activeDeadlines.forEach(deadline => {
-    // Check remaining hours needed
     const completedTasksForDeadline = existingTasks.filter(t => t.deadlineId === deadline.id && t.completed);
     const hoursCompleted = completedTasksForDeadline.reduce((sum, t) => sum + t.allocatedHours, 0);
     let hoursRemaining = Math.max(0.5, deadline.estimatedHours - hoursCompleted);
@@ -219,18 +207,15 @@ export function generateBalancedStudyTasks(deadlines: Deadline[], existingTasks:
     const due = parseDate(deadline.dueDate);
     const ref = parseDate(refDateStr);
 
-    // Calculate days available between today and due date
     const diffTime = due.getTime() - ref.getTime();
     const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
-    // Distribute study blocks across available days (max 3 days prep for small items, up to 7 for exams/projects)
     const prepDaysCount = Math.min(diffDays, deadline.priority === 'high' ? 6 : 4);
     const hoursPerSession = Number((hoursRemaining / prepDaysCount).toFixed(1));
 
     for (let i = prepDaysCount - 1; i >= 0; i--) {
       const taskDate = formatDate(addDays(due, -i));
       
-      // Skip past dates
       if (taskDate < refDateStr) continue;
 
       const taskId = `task-${deadline.id}-${taskDate}`;

@@ -98,6 +98,9 @@ export function loadAppData(): AppData {
       if (!parsed.courses || parsed.courses.length === 0) {
         parsed.courses = INITIAL_COURSES;
       }
+      if (!Array.isArray(parsed.tasks)) {
+        parsed.tasks = generateBalancedStudyTasks(parsed.deadlines || [], [], new Date());
+      }
       return parsed;
     }
   } catch (err) {
@@ -150,6 +153,9 @@ export function importAppDataJSON(jsonStr: string): AppData | null {
   try {
     const data: AppData = JSON.parse(jsonStr);
     if (Array.isArray(data.courses) && Array.isArray(data.deadlines)) {
+      if (!Array.isArray(data.tasks)) {
+        data.tasks = generateBalancedStudyTasks(data.deadlines, [], new Date());
+      }
       saveAppData(data);
       return data;
     }

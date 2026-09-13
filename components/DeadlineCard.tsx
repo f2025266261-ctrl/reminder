@@ -1,8 +1,8 @@
 'use client';
 
 import { Deadline, Course } from '@/lib/types';
-import { formatFriendlyDate } from '@/lib/planner';
-import { Clock, AlertCircle, CheckCircle2, Circle, Trash2, Tag } from 'lucide-react';
+import { formatFriendlyDate, parseDate } from '@/lib/planner';
+import { Clock, CheckCircle2, Circle, Trash2, Tag } from 'lucide-react';
 
 interface DeadlineCardProps {
   deadline: Deadline;
@@ -28,10 +28,10 @@ export default function DeadlineCard({ deadline, courses, onStatusChange, onDele
 
   const StatusIcon = statusIcons[deadline.status];
 
-  // Calculate days remaining
+  // Calculate days remaining with timezone safety
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const due = new Date(deadline.dueDate);
+  const due = parseDate(deadline.dueDate);
   due.setHours(0, 0, 0, 0);
   const diffDays = Math.round((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
