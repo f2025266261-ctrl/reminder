@@ -22,7 +22,7 @@ export function getNotificationPermission(): NotificationPermission {
   return Notification.permission;
 }
 
-export function sendBrowserNotification(title: string, body: string, icon: string = '/icon') {
+export function sendBrowserNotification(title: string, body: string, icon: string = '/icon-192.png') {
   if (!isNotificationSupported()) return;
 
   if (Notification.permission === 'granted') {

@@ -1,14 +1,19 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 
 export const metadata: Metadata = {
-  title: 'StudyPulse - Assignment Tracker & Weekly Study Planner',
-  description: 'Track course deadlines, balance weekly study load, parse syllabi, and re-run study plans every Sunday night.',
+  title: 'Reminder - Study Planner',
+  description: 'Track your courses, deadlines, and study plan',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/icon-192.png',
+    apple: '/icon-192.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'StudyPulse',
+    title: 'Reminder',
   },
 };
 
@@ -28,6 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark h-full antialiased">
       <body className="min-h-full flex flex-col bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white">
+        <ServiceWorkerRegister />
         {children}
       </body>
     </html>
