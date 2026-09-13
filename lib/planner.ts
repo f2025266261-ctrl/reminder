@@ -202,7 +202,7 @@ export function generateBalancedStudyTasks(deadlines: Deadline[], existingTasks:
   activeDeadlines.forEach(deadline => {
     const completedTasksForDeadline = existingTasks.filter(t => t.deadlineId === deadline.id && t.completed);
     const hoursCompleted = completedTasksForDeadline.reduce((sum, t) => sum + t.allocatedHours, 0);
-    let hoursRemaining = Math.max(0.5, deadline.estimatedHours - hoursCompleted);
+    const hoursRemaining = Math.max(0.5, deadline.estimatedHours - hoursCompleted);
 
     const due = parseDate(deadline.dueDate);
     const ref = parseDate(refDateStr);

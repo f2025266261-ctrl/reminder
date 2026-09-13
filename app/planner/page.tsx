@@ -13,6 +13,7 @@ export default function PlannerPage() {
   const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     setData(loadAppData());
   }, []);
@@ -62,7 +63,7 @@ export default function PlannerPage() {
               <span>Week-by-Week Load Balancing</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mt-1">
-              Study Schedule & Load Tracker
+              Study Schedule &amp; Load Tracker
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
               Automatically distributes assignment prep hours across days before deadlines to prevent cramming.

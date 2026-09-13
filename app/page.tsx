@@ -17,6 +17,7 @@ export default function Dashboard() {
   const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     const loaded = loadAppData();
     setData(loaded);
@@ -103,7 +104,7 @@ export default function Dashboard() {
               <span>Smart Study Load Balancer</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mt-1">
-              Course & Deadline Dashboard
+              Course &amp; Deadline Dashboard
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
               {formatFriendlyDate(todayStr)} • {data.deadlines.filter(d => d.status === 'pending').length} active deadlines
@@ -145,7 +146,7 @@ export default function Dashboard() {
 
           <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
             <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
-              <span>Today's Prep Hours</span>
+              <span>Today&apos;s Prep Hours</span>
               <CalendarDays className="h-4 w-4 text-emerald-400" />
             </div>
             <p className="mt-2 text-2xl font-bold text-white">
@@ -181,7 +182,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 <CalendarDays className="h-5 w-5 text-indigo-400" />
-                Today's Study Plan
+                Today&apos;s Study Plan
               </h2>
               <span className="text-xs font-semibold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-md">
                 {todaysTasks.length} tasks

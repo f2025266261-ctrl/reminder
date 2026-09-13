@@ -13,6 +13,7 @@ export default function BackupPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     setData(loadAppData());
   }, []);
@@ -22,7 +23,7 @@ export default function BackupPage() {
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-400">
         <div className="flex items-center space-x-2">
           <RefreshCw className="h-5 w-5 animate-spin text-indigo-500" />
-          <span>Loading backup & export tools...</span>
+          <span>Loading backup &amp; export tools...</span>
         </div>
       </div>
     );
@@ -83,10 +84,10 @@ vercel`;
           <div>
             <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400">
               <ShieldCheck className="h-4 w-4" />
-              <span>Data Protection & Deployment</span>
+              <span>Data Protection &amp; Deployment</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mt-1">
-              Backup, Sync & Reset Data
+              Backup, Sync &amp; Reset Data
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
               Export your data, clear sample demo entries to start fresh, or sync to GitHub and Vercel.
@@ -169,7 +170,7 @@ vercel`;
               className="w-full flex items-center justify-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg hover:bg-purple-500 transition-colors"
             >
               <Upload className="h-4 w-4" />
-              <span>Select & Upload JSON File</span>
+              <span>Select &amp; Upload JSON File</span>
             </button>
           </div>
         </div>
@@ -212,7 +213,7 @@ vercel`;
                   <Globe className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-white">Deploy on Vercel & Phone</h2>
+                  <h2 className="text-lg font-bold text-white">Deploy on Vercel &amp; Phone</h2>
                   <p className="text-xs text-slate-400">Production web application hosting + PWA setup.</p>
                 </div>
               </div>
@@ -238,7 +239,7 @@ vercel`;
 
               <div className="flex items-start gap-2">
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-[10px] font-bold text-emerald-400">3</span>
-                <p>Tap <strong>"Share"</strong> (Safari) or <strong>"Options (3 dots)"</strong> (Chrome) and select <strong>"Add to Home Screen"</strong>.</p>
+                <p>Tap <strong>&quot;Share&quot;</strong> (Safari) or <strong>&quot;Options (3 dots)&quot;</strong> (Chrome) and select <strong>&quot;Add to Home Screen&quot;</strong>.</p>
               </div>
             </div>
           </div>

@@ -19,6 +19,7 @@ export default function CoursesPage() {
   const [color, setColor] = useState('bg-blue-500/10 text-blue-400 border-blue-500/20');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     setData(loadAppData());
   }, []);
@@ -156,7 +157,7 @@ export default function CoursesPage() {
           {data.courses.length === 0 ? (
             <div className="col-span-full rounded-2xl border border-dashed border-slate-800 bg-slate-900/30 p-12 text-center text-slate-400">
               <p className="font-semibold text-slate-300">No courses created yet.</p>
-              <p className="text-xs text-slate-500 mt-1">Click "Add Course" above to add your real classes.</p>
+              <p className="text-xs text-slate-500 mt-1">Click &quot;Add Course&quot; above to add your real classes.</p>
             </div>
           ) : (
             data.courses.map(course => {

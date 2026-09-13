@@ -30,6 +30,7 @@ export default function DeadlinesPage() {
   const [notes, setNotes] = useState('');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     const loaded = loadAppData();
     setData(loaded);
@@ -192,7 +193,7 @@ export default function DeadlinesPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl">
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-              Assignments & Deadlines
+              Assignments &amp; Deadlines
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
               Add your own course deadlines or paste your syllabus text to auto-create assignments.
@@ -271,7 +272,7 @@ export default function DeadlinesPage() {
             <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/30 p-12 text-center text-slate-400">
               <FileText className="mx-auto h-10 w-10 text-slate-600 mb-3" />
               <p className="font-semibold text-slate-300">No deadlines added yet.</p>
-              <p className="text-xs text-slate-500 mt-1">Click "Add Deadline" or "Paste Syllabus Text" above to create your deadlines.</p>
+              <p className="text-xs text-slate-500 mt-1">Click &quot;Add Deadline&quot; or &quot;Paste Syllabus Text&quot; above to create your deadlines.</p>
             </div>
           ) : (
             filteredDeadlines.map(deadline => (
@@ -439,7 +440,7 @@ export default function DeadlinesPage() {
                 onClick={handleParseSyllabus}
                 className="rounded-lg bg-purple-600 px-4 py-2 text-xs font-bold text-white hover:bg-purple-500"
               >
-                Parse & Add Deadlines
+                Parse &amp; Add Deadlines
               </button>
             </div>
           </div>
