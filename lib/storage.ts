@@ -13,7 +13,6 @@ export const INITIAL_COURSES: Course[] = [
 export function getInitialDeadlines(): Deadline[] {
   const today = new Date();
 
-  // Generate dynamic relative dates so the app always displays live deadlines
   const addDaysStr = (days: number) => {
     const d = new Date(today);
     d.setDate(d.getDate() + days);
@@ -94,20 +93,19 @@ export function loadAppData(): AppData {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const parsed: AppData = JSON.parse(stored);
-      // Ensure all initial courses exist if empty
-      if (!parsed.courses || parsed.courses.length === 0) {
-        parsed.courses = INITIAL_COURSES;
+      // Return parsed data even if empty (user cleared it)
+      if (parsed && Array.isArray(parsed.courses) && Array.isArray(parsed.deadlines)) {
+        if (!Array.isArray(parsed.tasks)) {
+          parsed.tasks = generateBalancedStudyTasks(parsed.deadlines, [], new Date());
+        }
+        return parsed;
       }
-      if (!Array.isArray(parsed.tasks)) {
-        parsed.tasks = generateBalancedStudyTasks(parsed.deadlines || [], [], new Date());
-      }
-      return parsed;
     }
   } catch (err) {
     console.error('Failed to load local storage data:', err);
   }
 
-  // Fallback initial data
+  // Initial demo data fallback
   const initialDeadlines = getInitialDeadlines();
   const initialTasks = generateBalancedStudyTasks(initialDeadlines, [], new Date());
   const initialData: AppData = {
@@ -131,6 +129,17 @@ export function saveAppData(data: AppData): void {
   } catch (err) {
     console.error('Failed to save to local storage:', err);
   }
+}
+
+export function clearAllData(): AppData {
+  const emptyData: AppData = {
+    courses: [],
+    deadlines: [],
+    tasks: [],
+    lastRebalanced: new Date().toISOString()
+  };
+  saveAppData(emptyData);
+  return emptyData;
 }
 
 // 1-Click JSON Backup Export

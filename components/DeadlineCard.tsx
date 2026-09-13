@@ -2,16 +2,17 @@
 
 import { Deadline, Course } from '@/lib/types';
 import { formatFriendlyDate, parseDate } from '@/lib/planner';
-import { Clock, CheckCircle2, Circle, Trash2, Tag } from 'lucide-react';
+import { Clock, CheckCircle2, Circle, Trash2, Tag, Edit3 } from 'lucide-react';
 
 interface DeadlineCardProps {
   deadline: Deadline;
   courses: Course[];
   onStatusChange?: (id: string, status: Deadline['status']) => void;
+  onEdit?: (deadline: Deadline) => void;
   onDelete?: (id: string) => void;
 }
 
-export default function DeadlineCard({ deadline, courses, onStatusChange, onDelete }: DeadlineCardProps) {
+export default function DeadlineCard({ deadline, courses, onStatusChange, onEdit, onDelete }: DeadlineCardProps) {
   const course = courses.find(c => c.id === deadline.courseId);
 
   const priorityColors = {
@@ -28,7 +29,7 @@ export default function DeadlineCard({ deadline, courses, onStatusChange, onDele
 
   const StatusIcon = statusIcons[deadline.status];
 
-  // Calculate days remaining with timezone safety
+  // Calculate days remaining
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const due = parseDate(deadline.dueDate);
@@ -55,9 +56,13 @@ export default function DeadlineCard({ deadline, courses, onStatusChange, onDele
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
-            {course && (
+            {course ? (
               <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold border ${course.color}`}>
                 {course.code}
+              </span>
+            ) : (
+              <span className="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold border bg-slate-800 text-slate-400 border-slate-700">
+                General
               </span>
             )}
             <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-medium border capitalize ${priorityColors[deadline.priority]}`}>
@@ -88,7 +93,17 @@ export default function DeadlineCard({ deadline, courses, onStatusChange, onDele
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          {onEdit && (
+            <button
+              onClick={() => onEdit(deadline)}
+              className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-indigo-400 transition-colors"
+              title="Edit deadline"
+            >
+              <Edit3 className="h-4 w-4" />
+            </button>
+          )}
+
           {onStatusChange && (
             <button
               onClick={() => {

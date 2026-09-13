@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import Navbar from '@/components/Navbar';
 import { AppData } from '@/lib/types';
-import { loadAppData, exportAppDataJSON, importAppDataJSON } from '@/lib/storage';
-import { Download, Upload, Globe, Smartphone, RefreshCw, CheckCircle2, ShieldCheck, Copy, Check, GitBranch } from 'lucide-react';
+import { loadAppData, exportAppDataJSON, importAppDataJSON, clearAllData } from '@/lib/storage';
+import { Download, Upload, Globe, RefreshCw, ShieldCheck, Copy, Check, Trash2 } from 'lucide-react';
 
 export default function BackupPage() {
   const [data, setData] = useState<AppData | null>(null);
@@ -48,6 +48,13 @@ export default function BackupPage() {
     reader.readAsText(file);
   };
 
+  const handleClearData = () => {
+    if (confirm('Are you sure you want to clear all sample data? This will wipe demo courses and deadlines so you can start fresh.')) {
+      const reset = clearAllData();
+      setData(reset);
+    }
+  };
+
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     setCopiedCmd(label);
@@ -77,12 +84,20 @@ vercel`;
               <span>Data Protection & Deployment</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mt-1">
-              Backup, Sync & Vercel Deployment
+              Backup, Sync & Reset Data
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              Keep your course data safe with 1-click JSON exports, push your code to GitHub, and deploy to Vercel for phone usage.
+              Export your data, clear sample demo entries to start fresh, or sync to GitHub and Vercel.
             </p>
           </div>
+
+          <button
+            onClick={handleClearData}
+            className="flex items-center gap-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20 px-4 py-2.5 text-xs sm:text-sm font-semibold text-rose-400 hover:bg-rose-500/20 transition-colors"
+          >
+            <Trash2 className="h-4 w-4" />
+            <span>Clear All Sample Data</span>
+          </button>
         </div>
 
         {/* Grid Section 1: Backup & Restore */}
