@@ -6,10 +6,11 @@ import DeadlineCard from '@/components/DeadlineCard';
 import { AppData, Deadline, Priority } from '@/lib/types';
 import { loadAppData, saveAppData, clearAllData } from '@/lib/storage';
 import { parsePastedSyllabus, generateBalancedStudyTasks, formatDate } from '@/lib/planner';
-import { Plus, Search, FileText, RefreshCw, X, Sparkles, Trash2, Edit3 } from 'lucide-react';
+import { Plus, Search, FileText, RefreshCw, X, Sparkles, Trash2 } from 'lucide-react';
 
 export default function DeadlinesPage() {
   const [data, setData] = useState<AppData | null>(null);
+  const [mounted, setMounted] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCourse, setSelectedCourse] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -29,6 +30,7 @@ export default function DeadlinesPage() {
   const [notes, setNotes] = useState('');
 
   useEffect(() => {
+    setMounted(true);
     const loaded = loadAppData();
     setData(loaded);
     if (loaded.courses.length > 0) {
@@ -39,7 +41,7 @@ export default function DeadlinesPage() {
     setDueDate(formatDate(defaultDue));
   }, []);
 
-  if (!data) {
+  if (!mounted || !data) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-400">
         <div className="flex items-center space-x-2">
@@ -105,7 +107,6 @@ export default function DeadlinesPage() {
     let updatedDeadlines: Deadline[];
 
     if (editingDeadline) {
-      // Edit existing
       updatedDeadlines = data.deadlines.map(d => 
         d.id === editingDeadline.id
           ? {
@@ -120,7 +121,6 @@ export default function DeadlinesPage() {
           : d
       );
     } else {
-      // Add new
       const newDeadline: Deadline = {
         id: `d-${Date.now()}`,
         courseId: courseId || data.courses[0]?.id || '',
@@ -184,7 +184,7 @@ export default function DeadlinesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 pb-20 md:pb-12 text-slate-100">
+    <div className="min-h-screen bg-slate-950 pb-20 md:pb-12 text-slate-100" suppressHydrationWarning>
       <Navbar overloadedWeeksCount={0} />
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 space-y-6">

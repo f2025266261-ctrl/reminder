@@ -3,19 +3,21 @@
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import OverlapWarningBanner from '@/components/OverlapWarningBanner';
-import { AppData, WeekPlan, StudyTask } from '@/lib/types';
+import { AppData } from '@/lib/types';
 import { loadAppData, saveAppData } from '@/lib/storage';
-import { buildWeekPlans, generateBalancedStudyTasks, formatFriendlyDate, formatDate } from '@/lib/planner';
-import { CalendarDays, AlertTriangle, RefreshCw, CheckCircle2, Clock, Calendar, Check, Zap } from 'lucide-react';
+import { buildWeekPlans, generateBalancedStudyTasks, formatFriendlyDate } from '@/lib/planner';
+import { CalendarDays, AlertTriangle, RefreshCw, Check } from 'lucide-react';
 
 export default function PlannerPage() {
   const [data, setData] = useState<AppData | null>(null);
+  const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
+    setMounted(true);
     setData(loadAppData());
   }, []);
 
-  if (!data) {
+  if (!mounted || !data) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-400">
         <div className="flex items-center space-x-2">
@@ -48,7 +50,7 @@ export default function PlannerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 pb-20 md:pb-12 text-slate-100">
+    <div className="min-h-screen bg-slate-950 pb-20 md:pb-12 text-slate-100" suppressHydrationWarning>
       <Navbar onRebalance={handleRebalance} overloadedWeeksCount={overloadedWeeks.length} />
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 space-y-6">

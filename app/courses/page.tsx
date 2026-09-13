@@ -8,6 +8,7 @@ import { Plus, Trash2, Edit2, RefreshCw, X, User } from 'lucide-react';
 
 export default function CoursesPage() {
   const [data, setData] = useState<AppData | null>(null);
+  const [mounted, setMounted] = useState<boolean>(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
 
@@ -18,10 +19,11 @@ export default function CoursesPage() {
   const [color, setColor] = useState('bg-blue-500/10 text-blue-400 border-blue-500/20');
 
   useEffect(() => {
+    setMounted(true);
     setData(loadAppData());
   }, []);
 
-  if (!data) {
+  if (!mounted || !data) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-400">
         <div className="flex items-center space-x-2">
@@ -115,7 +117,7 @@ export default function CoursesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 pb-20 md:pb-12 text-slate-100">
+    <div className="min-h-screen bg-slate-950 pb-20 md:pb-12 text-slate-100" suppressHydrationWarning>
       <Navbar overloadedWeeksCount={0} />
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 space-y-6">

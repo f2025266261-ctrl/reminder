@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import DeadlineCard from '@/components/DeadlineCard';
 import OverlapWarningBanner from '@/components/OverlapWarningBanner';
-import { AppData, Deadline, StudyTask } from '@/lib/types';
+import { AppData, Deadline } from '@/lib/types';
 import { loadAppData, saveAppData } from '@/lib/storage';
 import { buildWeekPlans, generateBalancedStudyTasks, formatDate, formatFriendlyDate } from '@/lib/planner';
 import { CalendarDays, Clock, CheckCircle2, AlertCircle, Plus, BookOpen, Sparkles, RefreshCw } from 'lucide-react';
@@ -13,14 +13,16 @@ import Link from 'next/link';
 export default function Dashboard() {
   const [data, setData] = useState<AppData | null>(null);
   const [todayStr, setTodayStr] = useState<string>('');
+  const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
+    setMounted(true);
     const loaded = loadAppData();
     setData(loaded);
     setTodayStr(formatDate(new Date()));
   }, []);
 
-  if (!data) {
+  if (!mounted || !data) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-400">
         <div className="flex items-center space-x-2">
@@ -71,7 +73,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 pb-20 md:pb-12 text-slate-100">
+    <div className="min-h-screen bg-slate-950 pb-20 md:pb-12 text-slate-100" suppressHydrationWarning>
       <Navbar onRebalance={handleRebalance} overloadedWeeksCount={overloadedWeeks.length} />
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
@@ -191,8 +193,11 @@ export default function Dashboard() {
                         <input
                           type="checkbox"
                           checked={task.completed}
-                          onChange={() => {}}
-                          className="h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-600 focus:ring-indigo-500"
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleTaskToggle(task.id);
+                          }}
+                          className="h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                         />
                         <div>
                           <p className={`text-xs font-semibold ${task.completed ? 'line-through text-slate-500' : 'text-slate-200'}`}>
