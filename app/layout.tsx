@@ -1,22 +1,23 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
   title: 'StudyPulse - Assignment Tracker & Weekly Study Planner',
   description: 'Track course deadlines, balance weekly study load, parse syllabi, and re-run study plans every Sunday night.',
   manifest: '/manifest.json',
-  themeColor: '#0b0f17',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'StudyPulse',
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#0b0f17',
 };
 
 export default function RootLayout({
