@@ -7,8 +7,9 @@ import OverlapWarningBanner from '@/components/OverlapWarningBanner';
 import { AppData, Deadline } from '@/lib/types';
 import { loadAppData, saveAppData } from '@/lib/storage';
 import { buildWeekPlans, generateBalancedStudyTasks, formatDate, formatFriendlyDate } from '@/lib/planner';
-import { CalendarDays, Clock, CheckCircle2, AlertCircle, Plus, BookOpen, Sparkles, RefreshCw } from 'lucide-react';
+import { CalendarDays, Clock, CheckCircle2, AlertCircle, Plus, BookOpen, Sparkles, RefreshCw, Bell } from 'lucide-react';
 import Link from 'next/link';
+import { getNotificationPermission, sendBrowserNotification, triggerTestNotification } from '@/lib/notifications';
 
 export default function Dashboard() {
   const [data, setData] = useState<AppData | null>(null);
@@ -19,7 +20,19 @@ export default function Dashboard() {
     setMounted(true);
     const loaded = loadAppData();
     setData(loaded);
-    setTodayStr(formatDate(new Date()));
+    const today = formatDate(new Date());
+    setTodayStr(today);
+
+    // Auto-trigger reminder if notifications granted and tasks due today exist
+    if (getNotificationPermission() === 'granted' && loaded.deadlines.length > 0) {
+      const dueToday = loaded.deadlines.filter(d => d.dueDate === today && d.status !== 'completed');
+      if (dueToday.length > 0) {
+        sendBrowserNotification(
+          `⚠️ ${dueToday.length} Assignment(s) Due Today!`,
+          `Don't forget: ${dueToday.map(d => d.title).join(', ')}`
+        );
+      }
+    }
   }, []);
 
   if (!mounted || !data) {
@@ -69,7 +82,12 @@ export default function Dashboard() {
     };
     setData(updatedData);
     saveAppData(updatedData);
-    alert('Sunday Night Re-Run completed! Study schedule balanced across available days.');
+    
+    if (getNotificationPermission() === 'granted') {
+      sendBrowserNotification('✅ Sunday Re-Run Completed!', 'Your study prep hours have been re-balanced across all upcoming weeks.');
+    } else {
+      alert('Sunday Night Re-Run completed! Study schedule balanced across available days.');
+    }
   };
 
   return (
@@ -93,19 +111,19 @@ export default function Dashboard() {
           </div>
 
           <div className="flex flex-wrap gap-2">
+            <button
+              onClick={triggerTestNotification}
+              className="flex items-center gap-1.5 rounded-lg bg-slate-800 border border-slate-700 px-3.5 py-2 text-xs sm:text-sm font-semibold text-amber-300 hover:bg-slate-700 transition-colors"
+            >
+              <Bell className="h-4 w-4 text-amber-400" />
+              <span>Test Notification</span>
+            </button>
             <Link
               href="/deadlines"
               className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-2 text-xs sm:text-sm font-semibold text-white shadow hover:bg-indigo-500 transition-colors"
             >
               <Plus className="h-4 w-4" />
               <span>Add / Paste Deadlines</span>
-            </Link>
-            <Link
-              href="/courses"
-              className="flex items-center gap-1.5 rounded-lg bg-slate-800 px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-300 hover:bg-slate-700 transition-colors"
-            >
-              <BookOpen className="h-4 w-4 text-indigo-400" />
-              <span>Courses ({data.courses.length})</span>
             </Link>
           </div>
         </div>

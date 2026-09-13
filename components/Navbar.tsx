@@ -1,8 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, CalendarDays, BookOpen, Clock, Download, RefreshCw, AlertTriangle } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, BookOpen, Clock, Download, RefreshCw, Bell } from 'lucide-react';
+import { getNotificationPermission, requestNotificationPermission, sendBrowserNotification, triggerTestNotification } from '@/lib/notifications';
 
 interface NavbarProps {
   onRebalance?: () => void;
@@ -11,6 +13,21 @@ interface NavbarProps {
 
 export default function Navbar({ onRebalance, overloadedWeeksCount = 0 }: NavbarProps) {
   const pathname = usePathname();
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission>('default');
+
+  useEffect(() => {
+    setNotifPermission(getNotificationPermission());
+  }, []);
+
+  const handleEnableNotifications = async () => {
+    const perm = await requestNotificationPermission();
+    setNotifPermission(perm);
+    if (perm === 'granted') {
+      sendBrowserNotification('🔔 Notifications Enabled!', 'StudyPulse will remind you of upcoming deadlines and Sunday night study plans.');
+    } else {
+      alert('Notifications were not granted. Please enable notification permissions in your browser address bar.');
+    }
+  };
 
   const navItems = [
     { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -65,17 +82,34 @@ export default function Navbar({ onRebalance, overloadedWeeksCount = 0 }: Navbar
             })}
           </nav>
 
-          {onRebalance && (
+          <div className="flex items-center space-x-2">
             <button
-              onClick={onRebalance}
-              className="flex items-center space-x-2 rounded-lg bg-indigo-600 px-3.5 py-2 text-xs sm:text-sm font-semibold text-white shadow-md hover:bg-indigo-500 active:scale-95 transition-all"
-              title="Recalculate study load & re-balance schedule"
+              onClick={notifPermission === 'granted' ? triggerTestNotification : handleEnableNotifications}
+              className={`flex items-center space-x-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all border ${
+                notifPermission === 'granted'
+                  ? 'bg-slate-900 text-emerald-400 border-emerald-500/30 hover:bg-slate-800'
+                  : 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
+              }`}
+              title={notifPermission === 'granted' ? 'Notifications active! Click to send test alert.' : 'Enable browser notifications'}
             >
-              <RefreshCw className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              <span className="hidden sm:inline">Sunday Re-Run</span>
-              <span className="sm:hidden">Re-run</span>
+              <Bell className={`h-4 w-4 ${notifPermission === 'granted' ? 'text-emerald-400' : 'text-amber-400 animate-bounce'}`} />
+              <span className="hidden sm:inline">
+                {notifPermission === 'granted' ? 'Alerts Active' : 'Enable Notifications'}
+              </span>
             </button>
-          )}
+
+            {onRebalance && (
+              <button
+                onClick={onRebalance}
+                className="flex items-center space-x-2 rounded-lg bg-indigo-600 px-3.5 py-2 text-xs sm:text-sm font-semibold text-white shadow-md hover:bg-indigo-500 active:scale-95 transition-all"
+                title="Recalculate study load & re-balance schedule"
+              >
+                <RefreshCw className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Sunday Re-Run</span>
+                <span className="sm:hidden">Re-run</span>
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
